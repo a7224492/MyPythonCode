@@ -76,32 +76,37 @@ class DirSize:
         files = os.listdir(dirPath)
         for file in files:
             path = os.path.join(dirPath, file)
-            desc = DirSizeDescBuilder()
-            desc.setName(file)
-            desc.setSize(self.__calculateDirSize(path))
-            if os.path.isfile(path):
-                desc.setType("file")
-            elif os.path.isdir(path):
-                desc.setType("dir")
+            try:
+                print ("calculate ", path, " size")
+                desc = DirSizeDescBuilder()
+                desc.setName(file)
+                desc.setSize(self.__calculateDirSize(path))
+                if os.path.isfile(path):
+                    desc.setType("file")
+                elif os.path.isdir(path):
+                    desc.setType("dir")
+            except Exception:
+                print (path, "'s size is unkown!")
 
             self.descList.append(desc.build())
 rootPath = os.getcwd()
 dirSize = DirSize()
 dirSize.calculateSize(rootPath)
 
-def dirSizeCmp(x, y):
-    if x.size > y.size:
-        return -1
-    elif x.size == y.size:
-        return 0
-    elif x.size < y.size:
-        return 1
+def dirSizeCmp(x):
+    return x.size
 
-dirSize.descList.sort(cmp=dirSizeCmp)
+dirSize.descList.sort(key=dirSizeCmp)
 
+totalSize = 0
 for desc in dirSize.descList:
-    print desc
+    totalSize += desc.size
+    print (desc)
+
+print ("totalSize=", totalSize/1024/1024/1024)
 #desc = DirSizeDesc()
 #desc.name = "test"
 #desc.size = 10
 #desc.type = "file"
+
+os.system("pause")
